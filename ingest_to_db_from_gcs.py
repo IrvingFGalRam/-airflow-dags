@@ -26,7 +26,8 @@ GCS_BUCKET_NAME = "airflow-general-input"
 GCS_KEY_NAME = "data/noheader_test_log_reviews.csv"
 
 # Postgres constants
-POSTGRES_CONN_ID = "ml_conn"
+#POSTGRES_CONN_ID = "ml_conn"
+POSTGRES_CONN_ID = "postgres_default"
 POSTGRES_TABLE_NAME = "test_log_reviews"
 
 
