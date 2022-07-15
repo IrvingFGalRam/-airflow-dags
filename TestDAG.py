@@ -17,7 +17,7 @@ with DAG(
     validate = DummyOperator(task_id="validate")
     prepare = PostgresOperator(
         task_id="prepare",
-        postgres_conn_id=postgres_default,
+        postgres_conn_id="postgres_default",
         sql="",
     )
     load = DummyOperator(task_id="load")
