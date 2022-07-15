@@ -22,13 +22,13 @@ CLOUD_PROVIDER = "gcp"
 
 # GCP constants
 GCP_CONN_ID = "google_cloud_default"
-GCS_BUCKET_NAME = "airflow-general-input"
-GCS_KEY_NAME = "data/noheader_test_log_reviews.csv"
+GCS_BUCKET_NAME = "capstone-project-wzl-input"
+GCS_KEY_NAME = "noheader_test_log_reviews.csv"
 
 # Postgres constants
 #POSTGRES_CONN_ID = "ml_conn"
 POSTGRES_CONN_ID = "postgres_default"
-POSTGRES_TABLE_NAME = "test_log_reviews"
+POSTGRES_TABLE_NAME = "monthly_charts_data"
 
 
 def ingest_data_from_gcs(
@@ -77,9 +77,18 @@ with DAG(
         task_id="create_table_entity",
         postgres_conn_id=POSTGRES_CONN_ID,
         sql=f"""
-            CREATE TABLE IF NOT EXISTS {POSTGRES_TABLE_NAME} (
-                id_review SERIAL PRIMARY KEY,
-                log VARCHAR(255)
+            CREATE TABLE IF NOT EXISTS monthly_charts_data (
+                month VARCHAR(10),
+                position INTEGER,
+                artist VARCHAR(100),
+                song VARCHAR(100),
+                indicative_revenue NUMERIC,
+                us INTEGER,
+                uk INTEGER,
+                de INTEGER,
+                fr INTEGER,
+                ca INTEGER,
+                au INTEGER
             )
         """,
     )
