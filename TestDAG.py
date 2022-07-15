@@ -18,7 +18,21 @@ with DAG(
     prepare = PostgresOperator(
         task_id="prepare",
         postgres_conn_id="postgres_default",
-        sql="",
+        sql=f"""
+            CREATE TABLE IF NOT EXISTS {POSTGRES_TABLE_NAME} (
+                month VARCHAR(10),
+                position INTEGER,
+                artist VARCHAR(100),
+                song VARCHAR(100),
+                indicative_revenue NUMERIC,
+                us INTEGER,
+                uk INTEGER,
+                de INTEGER,
+                fr INTEGER,
+                ca INTEGER,
+                au INTEGER
+            )
+        """
     )
     load = DummyOperator(task_id="load")
     end_workflow = DummyOperator(task_id="end_workflow")
