@@ -19,7 +19,7 @@ with DAG(
         task_id="prepare",
         postgres_conn_id="postgres_default",
         sql=f"""
-            CREATE TABLE IF NOT EXISTS {POSTGRES_TABLE_NAME} (
+            CREATE TABLE IF NOT EXISTS monthly_charts_data (
                 month VARCHAR(10),
                 position INTEGER,
                 artist VARCHAR(100),
