@@ -16,7 +16,7 @@ from airflow.utils.dates import days_ago
 from airflow.utils.trigger_rule import TriggerRule
 
 # General constants
-DAG_ID = "gcp_database_ingestion_workflow"
+DAG_ID = "gcp_database_ingestion_workflow_3"
 STABILITY_STATE = "unstable"
 CLOUD_PROVIDER = "gcp"
 
