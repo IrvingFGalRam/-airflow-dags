@@ -21,7 +21,7 @@ STABILITY_STATE = "unstable"
 CLOUD_PROVIDER = "gcp"
 
 # GCP constants
-GCP_CONN_ID = "gcp-keyfile"
+GCP_CONN_ID = "gcp_default"
 GCS_BUCKET_NAME = "capstone-project-wzl-input"
 GCS_KEY_NAME = "noheader_test_log_reviews.csv"
 
@@ -35,7 +35,7 @@ def ingest_data_from_gcs(
     gcs_bucket: str,
     gcs_object: str,
     postgres_table: str,
-    gcp_conn_id: str = "gcp-keyfile",
+    gcp_conn_id: str = "gcp_default",
     postgres_conn_id: str = "postgres_default",
 ):
     """Ingest data from an GCS location into a postgres table.
