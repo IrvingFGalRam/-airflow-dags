@@ -35,7 +35,7 @@ def ingest_data_from_gcs(
     gcs_bucket: str,
     gcs_object: str,
     postgres_table: str,
-    gcp_conn_id: str = "google_cloud_default",
+    gcp_conn_id: str = "gcp-keyfile",
     postgres_conn_id: str = "postgres_default",
 ):
     """Ingest data from an GCS location into a postgres table.
