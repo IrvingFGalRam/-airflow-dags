@@ -23,7 +23,7 @@ CLOUD_PROVIDER = "gcp"
 # GCP constants
 GCP_CONN_ID = "google_cloud_default"
 GCS_BUCKET_NAME = "capstone-project-wzl-input"
-GCS_KEY_NAME = "user_purchase.csv"
+GCS_KEY_NAME = "t_user_purchase.csv"
 
 # Postgres constants
 POSTGRES_CONN_ID = "postgres_default"
