@@ -58,7 +58,7 @@ def ingest_data_from_gcs(
         with tempfile.NamedTemporaryFile() as tmp_df:
             df = pd.read_csv(tmp.name, header=0)
             df2 = df.drop(df.columns[4], axis = 1)
-            df.to_csv(path_or_buf=tmp_df.name,index=None, header=None, sep='\t')
+            df2.to_csv(path_or_buf=tmp_df.name,index=None, header=None, sep='\t')
             psql_hook.bulk_load(table=postgres_table, tmp_file=tmp_df.name)
 
 
