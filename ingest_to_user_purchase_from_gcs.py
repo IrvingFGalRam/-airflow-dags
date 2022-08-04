@@ -46,6 +46,7 @@ def ingest_data_from_gcs(
         postgres_conn_id (str): Name of the postgres connection ID.
     """
     import tempfile
+    import pandas as pd
 
     gcs_hook = GCSHook(gcp_conn_id=gcp_conn_id)
     psql_hook = PostgresHook(postgres_conn_id)
@@ -54,7 +55,10 @@ def ingest_data_from_gcs(
         gcs_hook.download(
             bucket_name=gcs_bucket, object_name=gcs_object, filename=tmp.name
         )
-        psql_hook.bulk_load(table=postgres_table, tmp_file=tmp.name)
+        with tempfile.NamedTemporaryFile() as tmp_df:
+            df = pd.read_csv(tmp.name, header=0)
+            df.to_csv(path_or_buf=tmp_df.name,index=None, header=None, sep='\t')
+            psql_hook.bulk_load(table=postgres_table, tmp_file=tmp_df.name)
 
 
 with DAG(
