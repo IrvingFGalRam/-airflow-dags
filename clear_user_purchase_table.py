@@ -1,7 +1,6 @@
-"""Database Ingestion Workflow
-Author: Enrique Olivares <enrique.olivares@wizeline.com>
-Modified: Irving FGR
-Description: Ingests the data from a GCS bucket into a postgres table.
+"""Database Clearing Workflow
+Author: Irving FGR
+Description: Drops postgres table from a GCP SqlInstance's DB.
 """
 
 from airflow.models import DAG
@@ -41,7 +40,7 @@ with DAG(
     clear_table = PostgresOperator(
         task_id="clear_table",
         postgres_conn_id=POSTGRES_CONN_ID,
-        sql=f"DELETE FROM {POSTGRES_TABLE_NAME}",
+        sql=f"DROP TABLE IF EXISTS {POSTGRES_TABLE_NAME}",
     )
     continue_process = DummyOperator(task_id="continue_process")
 
