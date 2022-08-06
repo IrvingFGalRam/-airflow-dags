@@ -5,6 +5,7 @@ Description: Flushes the content of a table into a GCS bucket as a CSV.
 
 import csv
 import logging
+import tempfile
 
 from airflow.models import DAG
 from airflow.operators.dummy import DummyOperator
@@ -42,12 +43,14 @@ def postgres_to_gcs():
     cursor = conn.cursor()
     cursor.execute("select * from " + postgres_table)
     result = cursor.fetchall()
-    with open(postgres_table +'.csv', 'w') as fp:
-        a = csv.writer(fp, quoting = csv.QUOTE_MINIMAL, delimiter = ',')
+    # with open(postgres_table +'.csv', 'w') as fp:
+    # with tempfile.NamedTemporaryFile(mode='wb', delete=True) as tmp:
+    with tempfile.NamedTemporaryFile() as tmp:
+        a = csv.writer(tmp, quoting = csv.QUOTE_MINIMAL, delimiter = ',')
         a.writerow([i[0] for i in cursor.description])
         a.writerows(result)
-    logging.info("Uploading to bucket, " + postgres_table + "_psql.csv")
-    gcs_hook.upload(GCS_BUCKET_NAME, GCS_PATH + postgres_table + "_psql.csv", postgres_table + "_psql.csv")
+        logging.info("Uploading to bucket, " + postgres_table + "_psql.csv")
+        gcs_hook.upload(GCS_BUCKET_NAME, GCS_PATH + postgres_table + "_psql.csv", tmp.name)
 
 
 # def postgres_to_gcs(
@@ -72,12 +75,12 @@ def postgres_to_gcs():
 #     cursor = conn.cursor()
 #     cursor.execute("select * from " + postgres_table)
 #     result = cursor.fetchall()
-#     with open(postgres_table +'.csv', 'w') as fp:
-#         a = csv.writer(fp, quoting = csv.QUOTE_MINIMAL, delimiter = ',')
+#     with tempfile.NamedTemporaryFile() as tmp:
+#         a = csv.writer(tmp, quoting = csv.QUOTE_MINIMAL, delimiter = ',')
 #         a.writerow([i[0] for i in cursor.description])
 #         a.writerows(result)
-#     logging.info("Uploading to bucket, " + postgres_table + ".csv")
-#     gcs_hook.upload(gcs_bucket, gcs_path + postgres_table + "_psql.csv", postgres_table + "_psql.csv")
+#         logging.info("Uploading to bucket, " + postgres_table + "_psql.csv")
+#         gcs_hook.upload(GCS_BUCKET_NAME, GCS_PATH + postgres_table + "_psql.csv", tmp.name)
 
 
 with DAG(
