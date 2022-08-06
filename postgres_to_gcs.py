@@ -88,14 +88,6 @@ with DAG(
 ) as dag:
     start_workflow = DummyOperator(task_id="start_workflow")
 
-    validate_data = BranchSQLOperator(
-        task_id="validate_data",
-        conn_id=POSTGRES_CONN_ID,
-        sql=f"SELECT COUNT(*) AS total_rows FROM {POSTGRES_TABLE_NAME}",
-        follow_task_ids_if_false=[continue_process.task_id],
-        follow_task_ids_if_true=[postgres_to_gcs_csv.task_id],
-    )
-
     continue_process = DummyOperator(task_id="continue_process")
 
     postgres_to_gcs_csv = PythonOperator(
@@ -114,6 +106,14 @@ with DAG(
     #         "postgres_table": POSTGRES_TABLE_NAME,
     #     }
     # )
+
+    validate_data = BranchSQLOperator(
+        task_id="validate_data",
+        conn_id=POSTGRES_CONN_ID,
+        sql=f"SELECT COUNT(*) AS total_rows FROM {POSTGRES_TABLE_NAME}",
+        follow_task_ids_if_false=[continue_process.task_id],
+        follow_task_ids_if_true=[postgres_to_gcs_csv.task_id],
+    )
 
     end_workflow = DummyOperator(
         task_id="end_workflow",
