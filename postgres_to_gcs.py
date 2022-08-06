@@ -36,8 +36,8 @@ POSTGRES_TABLE_NAME = "user_purchase"
 
 def postgres_to_gcs():
     postgres_table = POSTGRES_TABLE_NAME
-    # gcs_hook = GCSHook(GCP_CONN_ID)
-    gcs_hook = GoogleCloudStorageHook(GCP_CONN_ID)
+    gcs_hook = GCSHook(GCP_CONN_ID)
+    # gcs_hook = GoogleCloudStorageHook(GCP_CONN_ID)
     pg_hook = PostgresHook.get_hook(POSTGRES_CONN_ID)
     conn = pg_hook.get_conn()
     cursor = conn.cursor()
@@ -46,7 +46,7 @@ def postgres_to_gcs():
     # with tempfile.NamedTemporaryFile() as tmp:
     # with open(postgres_table + "_psql.csv", 'w') as tmp:
     with tempfile.NamedTemporaryFile(mode='wb') as tmp:
-        a = csv.writer(fp, quoting = csv.QUOTE_MINIMAL, delimiter = ',')
+        a = csv.writer(tmp, quoting = csv.QUOTE_MINIMAL, delimiter = ',')
         a.writerow([i[0] for i in cursor.description])
         a.writerows(result)
         logging.info("Uploading to bucket, " + postgres_table + "_psql.csv")
