@@ -43,10 +43,10 @@ def postgres_to_gcs():
     cursor = conn.cursor()
     cursor.execute("select * from " + postgres_table)
     result = cursor.fetchall()
-    # with open(postgres_table +'.csv', 'w') as fp:
-    # with tempfile.NamedTemporaryFile(mode='wb', delete=True) as tmp:
-    with tempfile.NamedTemporaryFile() as tmp:
-        a = csv.writer(tmp, quoting = csv.QUOTE_MINIMAL, delimiter = ',')
+    # with tempfile.NamedTemporaryFile() as tmp:
+    # with open(postgres_table + "_psql.csv", 'w') as tmp:
+    with tempfile.NamedTemporaryFile(mode='wb') as tmp:
+        a = csv.writer(fp, quoting = csv.QUOTE_MINIMAL, delimiter = ',')
         a.writerow([i[0] for i in cursor.description])
         a.writerows(result)
         logging.info("Uploading to bucket, " + postgres_table + "_psql.csv")
