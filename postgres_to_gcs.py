@@ -35,24 +35,6 @@ POSTGRES_CONN_ID = "postgres_default"
 POSTGRES_TABLE_NAME = "user_purchase"
 
 
-# def postgres_to_gcs():
-#     postgres_table = POSTGRES_TABLE_NAME
-#     # gcs_hook = GCSHook(GCP_CONN_ID)
-#     gcs_hook = GoogleCloudStorageHook(GCP_CONN_ID)
-#     pg_hook = PostgresHook.get_hook(POSTGRES_CONN_ID)
-#     file_name = postgres_table + GCS_POSTGRES_CSV_ID
-#     conn = pg_hook.get_conn()
-#     cursor = conn.cursor()
-#     cursor.execute("select * from " + postgres_table)
-#     result = cursor.fetchall()
-#     with open(file_name, 'w') as tmp:
-#         a = csv.writer(tmp, quoting = csv.QUOTE_MINIMAL, delimiter = ',')
-#         a.writerow([i[0] for i in cursor.description])
-#         a.writerows(result)
-#         logging.info("Uploading to bucket, " + file_name)
-#         gcs_hook.upload(GCS_BUCKET_NAME, GCS_PATH + file_name, tmp.name)
-
-
 def postgres_to_gcs(
     gcs_bucket: str,
     gcs_path: str,
@@ -94,11 +76,6 @@ with DAG(
 
     continue_process = DummyOperator(task_id="continue_process")
 
-    # postgres_to_gcs_csv = PythonOperator(
-    #     task_id="postgres_to_gcs_csv",
-    #     python_callable=postgres_to_gcs,
-    # )
-
     postgres_to_gcs_csv = PythonOperator(
         task_id="postgres_to_gcs_csv",
         python_callable=postgres_to_gcs,
@@ -112,8 +89,8 @@ with DAG(
         }
     )
 
-    validate_data = BranchSQLOperator(
-        task_id="validate_data",
+    validate_data_csv = BranchSQLOperator(
+        task_id="validate_data_csv",
         conn_id=POSTGRES_CONN_ID,
         sql=f"SELECT COUNT(*) AS total_rows FROM {POSTGRES_TABLE_NAME}",
         follow_task_ids_if_false=[continue_process.task_id],
@@ -125,12 +102,7 @@ with DAG(
         trigger_rule=TriggerRule.ONE_SUCCESS
     )
 
-    start_workflow >> validate_data >> [continue_process, postgres_to_gcs_csv] >> end_workflow
+    start_workflow >> validate_data_csv >> [continue_process, postgres_to_gcs_csv] >> end_workflow
 
-    # (
-    #     start_workflow
-    #     >> validate_data
-    # )
-    # validate_data >> [continue_process, postgres_to_gcs_csv] >> end_workflow
 
     # dag.doc_md = __doc__
