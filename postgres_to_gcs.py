@@ -35,8 +35,8 @@ POSTGRES_TABLE_NAME = "user_purchase"
 
 def postgres_to_gcs():
     postgres_table = POSTGRES_TABLE_NAME
-    gcs_hook = GCSHook(GCP_CONN_ID)
-    # gcs_hook = GoogleCloudStorageHook(GOOGLE_CONN_ID)
+    # gcs_hook = GCSHook(GCP_CONN_ID)
+    gcs_hook = GoogleCloudStorageHook(GCP_CONN_ID)
     pg_hook = PostgresHook.get_hook(POSTGRES_CONN_ID)
     conn = pg_hook.get_conn()
     cursor = conn.cursor()
@@ -46,7 +46,7 @@ def postgres_to_gcs():
         a = csv.writer(fp, quoting = csv.QUOTE_MINIMAL, delimiter = ',')
         a.writerow([i[0] for i in cursor.description])
         a.writerows(result)
-    logging.info("Uploading to bucket, " + postgres_table + ".csv")
+    logging.info("Uploading to bucket, " + postgres_table + "_psql.csv")
     gcs_hook.upload(GCS_BUCKET_NAME, GCS_PATH + postgres_table + "_psql.csv", postgres_table + "_psql.csv")
 
 
@@ -66,7 +66,7 @@ def postgres_to_gcs():
 #         postgres_conn_id (str): Name of the postgres connection ID.
 #     """
 #     gcs_hook = GCSHook(gcp_conn_id=gcp_conn_id)
-#     # gcs_hook = GoogleCloudStorageHook(GOOGLE_CONN_ID)
+#     # gcs_hook = GoogleCloudStorageHook(gcp_conn_id=gcp_conn_id)
 #     pg_hook = PostgresHook.get_hook(postgres_conn_id)
 #     conn = pg_hook.get_conn()
 #     cursor = conn.cursor()
