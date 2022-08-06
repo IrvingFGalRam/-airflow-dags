@@ -28,59 +28,60 @@ CLOUD_PROVIDER = "gcp"
 GCP_CONN_ID = "google_cloud_default"
 GCS_BUCKET_NAME = "capstone-project-wzl-storage"
 GCS_PATH = "tmp/"
+GCS_POSTGRES_CSV_ID = "_psql.csv"
 
 # Postgres constants
 POSTGRES_CONN_ID = "postgres_default"
 POSTGRES_TABLE_NAME = "user_purchase"
 
 
-def postgres_to_gcs():
-    postgres_table = POSTGRES_TABLE_NAME
-    # gcs_hook = GCSHook(GCP_CONN_ID)
-    gcs_hook = GoogleCloudStorageHook(GCP_CONN_ID)
-    pg_hook = PostgresHook.get_hook(POSTGRES_CONN_ID)
-    conn = pg_hook.get_conn()
-    cursor = conn.cursor()
-    cursor.execute("select * from " + postgres_table)
-    result = cursor.fetchall()
-    # with tempfile.NamedTemporaryFile() as tmp:
-    with open(postgres_table + "_psql.csv", 'w') as tmp:
-    # with tempfile.NamedTemporaryFile(mode='w+b') as tmp:
-        a = csv.writer(tmp, quoting = csv.QUOTE_MINIMAL, delimiter = ',')
-        a.writerow([i[0] for i in cursor.description])
-        a.writerows(result)
-        logging.info("Uploading to bucket, " + postgres_table + "_psql.csv")
-        gcs_hook.upload(GCS_BUCKET_NAME, GCS_PATH + postgres_table + "_psql.csv", tmp.name)
-
-
-# def postgres_to_gcs(
-#     gcs_bucket: str,
-#     gcs_path: str,
-#     postgres_table: str,
-#     gcp_conn_id: str = "google_cloud_default",
-#     postgres_conn_id: str = "postgres_default",
-# ):
-#     """Flushes the content of a table into a GCS bucket as a CSV.
-#     Args:
-#         gcs_bucket (str): Name of the bucket.
-#         gcs_path (str): Path to save the csv.
-#         postgres_table (str): Name of the postgres table.
-#         gcp_conn_id (str): Name of the Google Cloud connection ID.
-#         postgres_conn_id (str): Name of the postgres connection ID.
-#     """
-#     gcs_hook = GCSHook(gcp_conn_id=gcp_conn_id)
-#     # gcs_hook = GoogleCloudStorageHook(gcp_conn_id=gcp_conn_id)
-#     pg_hook = PostgresHook.get_hook(postgres_conn_id)
+# def postgres_to_gcs():
+#     postgres_table = POSTGRES_TABLE_NAME
+#     # gcs_hook = GCSHook(GCP_CONN_ID)
+#     gcs_hook = GoogleCloudStorageHook(GCP_CONN_ID)
+#     pg_hook = PostgresHook.get_hook(POSTGRES_CONN_ID)
+#     file_name = postgres_table + GCS_POSTGRES_CSV_ID
 #     conn = pg_hook.get_conn()
 #     cursor = conn.cursor()
 #     cursor.execute("select * from " + postgres_table)
 #     result = cursor.fetchall()
-#     with tempfile.NamedTemporaryFile() as tmp:
+#     with open(file_name, 'w') as tmp:
 #         a = csv.writer(tmp, quoting = csv.QUOTE_MINIMAL, delimiter = ',')
 #         a.writerow([i[0] for i in cursor.description])
 #         a.writerows(result)
-#         logging.info("Uploading to bucket, " + postgres_table + "_psql.csv")
-#         gcs_hook.upload(GCS_BUCKET_NAME, GCS_PATH + postgres_table + "_psql.csv", tmp.name)
+#         logging.info("Uploading to bucket, " + file_name)
+#         gcs_hook.upload(GCS_BUCKET_NAME, GCS_PATH + file_name, tmp.name)
+
+
+def postgres_to_gcs(
+    gcs_bucket: str,
+    gcs_path: str,
+    postgres_table: str,
+    file_name: str,
+    gcp_conn_id: str = "google_cloud_default",
+    postgres_conn_id: str = "postgres_default",
+):
+    """Flushes the content of a table into a GCS bucket as a CSV.
+    Args:
+        gcs_bucket (str): Name of the bucket.
+        gcs_path (str): Path to save the csv.
+        postgres_table (str): Name of the postgres table.
+        file_name (str): Name of the file to upload
+        gcp_conn_id (str): Name of the Google Cloud connection ID.
+        postgres_conn_id (str): Name of the postgres connection ID.
+    """
+    gcs_hook = GoogleCloudStorageHook(gcp_conn_id=gcp_conn_id)
+    pg_hook = PostgresHook.get_hook(postgres_conn_id)
+    conn = pg_hook.get_conn()
+    cursor = conn.cursor()
+    cursor.execute("select * from " + postgres_table)
+    result = cursor.fetchall()
+    with open(file_name, 'w') as tmp:
+        a = csv.writer(tmp, quoting = csv.QUOTE_MINIMAL, delimiter = ',')
+        a.writerow([i[0] for i in cursor.description])
+        a.writerows(result)
+        logging.info("Uploading to bucket, " + file_name)
+        gcs_hook.upload(gcs_bucket, gcs_path + file_name, tmp.name)
 
 
 with DAG(
@@ -93,22 +94,23 @@ with DAG(
 
     continue_process = DummyOperator(task_id="continue_process")
 
-    postgres_to_gcs_csv = PythonOperator(
-        task_id="postgres_to_gcs_csv",
-        python_callable=postgres_to_gcs,
-    )
-
     # postgres_to_gcs_csv = PythonOperator(
     #     task_id="postgres_to_gcs_csv",
     #     python_callable=postgres_to_gcs,
-    #     op_kwargs={
-    #         "gcp_conn_id": GCP_CONN_ID,
-    #         "postgres_conn_id": POSTGRES_CONN_ID,
-    #         "gcs_bucket": GCS_BUCKET_NAME,
-    #         "gcs_path": GCS_PATH,
-    #         "postgres_table": POSTGRES_TABLE_NAME,
-    #     }
     # )
+
+    postgres_to_gcs_csv = PythonOperator(
+        task_id="postgres_to_gcs_csv",
+        python_callable=postgres_to_gcs,
+        op_kwargs={
+            "gcp_conn_id": GCP_CONN_ID,
+            "postgres_conn_id": POSTGRES_CONN_ID,
+            "gcs_bucket": GCS_BUCKET_NAME,
+            "gcs_path": GCS_PATH,
+            "postgres_table": POSTGRES_TABLE_NAME,
+            "file_name": POSTGRES_TABLE_NAME + GCS_POSTGRES_CSV_ID,
+        }
+    )
 
     validate_data = BranchSQLOperator(
         task_id="validate_data",
