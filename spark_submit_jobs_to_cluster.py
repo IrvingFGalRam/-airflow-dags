@@ -20,7 +20,8 @@ REGION = "us-central1"
 ZONE = "us-central1-a"
 
 PROJECT_ID = os.environ.get("SYSTEM_TESTS_GCP_PROJECT", "")
-JOB_NAME_SELECTOR = os.environ.get("JOB_NAME_SELECTOR", "")    # "test", "show", "rl", "crm", "uo", "obt"
+# "test", "show", "rl", "crm", "up", "obt"
+JOB_NAME_SELECTOR = os.environ.get("JOB_NAME_SELECTOR", "")
 # ENVs to Arguments
 ARG_TABLE_NAME = os.environ.get("ARG_TABLE_NAME", "")
 ARG_FORMAT = os.environ.get("ARG_FORMAT", "")
@@ -102,12 +103,12 @@ SPARK_JOB_OBT = {
 }
 
 JOB_DICT = {
-    "test" : SPARK_JOB_TEST,
-    "show" : SPARK_JOB_SHOW_TABLE,
-    "rl" : SPARK_JOB_T_RL,
-    "crm" : SPARK_JOB_T_CMR,
-    "uo" : SPARK_JOB_T_UP,
-    "obt" : SPARK_JOB_OBT
+    "test": SPARK_JOB_TEST,
+    "show": SPARK_JOB_SHOW_TABLE,
+    "rl": SPARK_JOB_T_RL,
+    "crm": SPARK_JOB_T_CMR,
+    "up": SPARK_JOB_T_UP,
+    "obt": SPARK_JOB_OBT
 }
 
 with DAG(
@@ -120,7 +121,7 @@ with DAG(
 
     spark_custom_task = DataprocSubmitJobOperator(
         task_id="spark_custom_task",
-        job=JOB_DICT[JOB_NAME_SELECTOR],
+        job=JOB_DICT[str(JOB_NAME_SELECTOR)],
         region=REGION,
         project_id=PROJECT_ID
     )
