@@ -20,10 +20,10 @@ CLUSTER = "dataproc"
 REGION = "us-central1"
 ZONE = "us-central1-a"
 
+# ENV VAR
 PROJECT_ID = os.environ.get("SYSTEM_TESTS_GCP_PROJECT", "")
-# "test", "show", "rl", "crm", "up", "obt"
-JOB_NAME_SELECTOR = Variable.get("JOB_NAME_SELECTOR")
-# ENVs to Arguments
+# Variables to Arguments
+JOB_NAME_SELECTOR = Variable.get("JOB_NAME_SELECTOR")   # "test", "show", "rl", "crm", "up", "obt"
 ARG_TABLE_NAME = Variable.get("ARG_TABLE_NAME")
 ARG_FORMAT = Variable.get("ARG_FORMAT")
 ARG_N_RECORDS = Variable.get("ARG_N_RECORDS")
@@ -71,11 +71,11 @@ SPARK_JOB_T_RL = {
     "spark_job": {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
         "main_class": "org.example.TransformReviewLogs",
-        "args": {
+        "args": [
             "gs://capstone-project-wzl-storage/bronze/log_reviews.csv",
             "gs://capstone-project-wzl-storage/silver/review_logs",
             ARG_FORMAT
-        }
+        ]
     }
 }
 SPARK_JOB_T_UP = {
@@ -84,11 +84,11 @@ SPARK_JOB_T_UP = {
     "spark_job": {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
         "main_class": "org.example.TransformUserPurchase",
-        "args": {
+        "args": [
             "gs://capstone-project-wzl-storage/tmp/user_purchase_psql.csv",
             "gs://capstone-project-wzl-storage/silver/user_purchase",
             ARG_FORMAT
-        }
+        ]
     }
 }
 SPARK_JOB_OBT = {
@@ -97,9 +97,9 @@ SPARK_JOB_OBT = {
     "spark_job": {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
         "main_class": "org.example.GoldOBT",
-        "args": {
+        "args": [
             "gs://capstone-project-wzl-storage/gold/movie_analytics"
-        }
+        ]
     }
 }
 

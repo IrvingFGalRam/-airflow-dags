@@ -4,7 +4,7 @@ Description: Creates an ephimeral dataproc spark cluster to submit jobs.
 """
 
 import os
-from datetime import datetime
+from airflow.models import Variable
 from airflow.models import DAG
 from airflow.operators.dummy import DummyOperator
 from airflow.providers.google.cloud.operators.dataproc import (
@@ -23,12 +23,16 @@ from airflow.utils.dates import days_ago
 
 # General constants
 DAG_ID = "dataproc_spark_complete_flow"
-PROJECT_ID = os.environ.get("SYSTEM_TESTS_GCP_PROJECT", "")
 CLUSTER_NAME = "cluster-dataproc-spark-deb"
 CLOUD_PROVIDER = "gcp"
 CLUSTER = "dataproc"
 REGION = "us-central1"
 ZONE = "us-central1-a"
+
+# ENV VAR
+PROJECT_ID = os.environ.get("SYSTEM_TESTS_GCP_PROJECT", "")
+# Variables to Arguments
+ARG_FORMAT = Variable.get("ARG_FORMAT", default_var="avro")
 
 CLUSTER_CONFIG = {
     "master_config": {
@@ -53,14 +57,18 @@ CLUSTER_CONFIG = {
 TIMEOUT = {"seconds": 1 * 2 * 60 * 60}
 
 # Jobs definitions
-# [START how_to_cloud_dataproc_spark_config]
 SPARK_JOB_T_CMR = {
     "reference": {"project_id": PROJECT_ID},
     "placement": {"cluster_name": CLUSTER_NAME},
     "spark_job": {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
         "main_class": "org.example.TransformClassifiedMovieReview",
-    },
+        "args": [
+            "gs://capstone-project-wzl-storage/bronze/movie_review.csv",
+            "gs://capstone-project-wzl-storage/silver/classified_movie_review",
+            ARG_FORMAT
+        ]
+    }
 }
 SPARK_JOB_T_RL = {
     "reference": {"project_id": PROJECT_ID},
@@ -68,7 +76,12 @@ SPARK_JOB_T_RL = {
     "spark_job": {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
         "main_class": "org.example.TransformReviewLogs",
-    },
+        "args": [
+            "gs://capstone-project-wzl-storage/bronze/log_reviews.csv",
+            "gs://capstone-project-wzl-storage/silver/review_logs",
+            ARG_FORMAT
+        ]
+    }
 }
 SPARK_JOB_T_UP = {
     "reference": {"project_id": PROJECT_ID},
@@ -76,7 +89,12 @@ SPARK_JOB_T_UP = {
     "spark_job": {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
         "main_class": "org.example.TransformUserPurchase",
-    },
+        "args": [
+            "gs://capstone-project-wzl-storage/tmp/user_purchase_psql.csv",
+            "gs://capstone-project-wzl-storage/silver/user_purchase",
+            ARG_FORMAT
+        ]
+    }
 }
 SPARK_JOB_OBT = {
     "reference": {"project_id": PROJECT_ID},
@@ -84,7 +102,10 @@ SPARK_JOB_OBT = {
     "spark_job": {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
         "main_class": "org.example.GoldOBT",
-    },
+        "args": [
+            "gs://capstone-project-wzl-storage/gold/movie_analytics"
+        ]
+    }
 }
 
 
