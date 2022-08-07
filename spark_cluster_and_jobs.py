@@ -22,22 +22,13 @@ from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.utils.dates import days_ago
 
 # General constants
-DAG_ID = "dataproc_spark"
+DAG_ID = "dataproc_spark_complete_flow"
 PROJECT_ID = os.environ.get("SYSTEM_TESTS_GCP_PROJECT", "")
-CLUSTER_NAME = "cluster-dataproc-hive-deb"
+CLUSTER_NAME = "cluster-dataproc-spark-deb"
 CLOUD_PROVIDER = "gcp"
-STABILITY_STATE = "unstable"
+CLUSTER = "dataproc"
 REGION = "us-central1"
 ZONE = "us-central1-a"
-
-# # GCP constants
-# GCP_CONN_ID = "google_cloud_default"
-# GCS_BUCKET_NAME = "capstone-project-wzl-storage"
-# # GCS_KEY_NAME = "noheader_test_log_reviews.csv"
-#
-# # Postgres constants
-# POSTGRES_CONN_ID = "postgres_default"
-# POSTGRES_TABLE_NAME = "user_purchase"
 
 CLUSTER_CONFIG = {
     "master_config": {
@@ -63,35 +54,6 @@ TIMEOUT = {"seconds": 1 * 2 * 60 * 60}
 
 # Jobs definitions
 # [START how_to_cloud_dataproc_spark_config]
-SPARK_JOB = {
-    "reference": {"project_id": PROJECT_ID},
-    "placement": {"cluster_name": CLUSTER_NAME},
-    "spark_job": {
-        "jar_file_uris": ["file:///usr/lib/spark/examples/jars/spark-examples.jar"],
-        "main_class": "org.apache.spark.examples.SparkPi",
-    },
-}
-SPARK_JOB_TEST = {
-    "reference": {"project_id": PROJECT_ID},
-    "placement": {"cluster_name": CLUSTER_NAME},
-    "spark_job": {
-        "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
-        "main_class": "org.example.TestSparkSession",
-    },
-}
-# SPARK_JOB_SHOW_TABLE = {
-#     "reference": {"project_id": PROJECT_ID},
-#     "placement": {"cluster_name": CLUSTER_NAME},
-#     "spark_job": {
-#         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
-#         "main_class": "org.example.TestSparkSession",
-#     },
-#     "arguments": {
-#         "gs://capstone-project-wzl-storage/silver/classified_movie_review",
-#         "avro",
-#         "25"
-#     }
-# }
 SPARK_JOB_T_CMR = {
     "reference": {"project_id": PROJECT_ID},
     "placement": {"cluster_name": CLUSTER_NAME},
@@ -116,13 +78,21 @@ SPARK_JOB_T_UP = {
         "main_class": "org.example.TransformUserPurchase",
     },
 }
+SPARK_JOB_OBT = {
+    "reference": {"project_id": PROJECT_ID},
+    "placement": {"cluster_name": CLUSTER_NAME},
+    "spark_job": {
+        "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
+        "main_class": "org.example.GoldOBT",
+    },
+}
 
 
 with DAG(
     dag_id=DAG_ID,
     schedule_interval="@once",
     start_date=days_ago(1),
-    tags=[CLOUD_PROVIDER, "dataproc"],
+    tags=[CLOUD_PROVIDER, CLUSTER],
 ) as dag:
     start_workflow = DummyOperator(task_id="start_workflow")
 
@@ -135,13 +105,37 @@ with DAG(
 
     )
 
-    spark_task = DataprocSubmitJobOperator(
+    spark_task_t_rl = DataprocSubmitJobOperator(
+        task_id="spark_task_t_rl",
+        job=SPARK_JOB_T_RL,
+        region=REGION,
+        project_id=PROJECT_ID,
+
+    )
+
+    spark_task_t_cmr = DataprocSubmitJobOperator(
         task_id="spark_task_t_cmr",
         job=SPARK_JOB_T_CMR,
         region=REGION,
         project_id=PROJECT_ID,
 
     )
+
+    spark_task_t_up = DataprocSubmitJobOperator(
+        task_id="spark_task_t_cmr",
+        job=SPARK_JOB_T_UP,
+        region=REGION,
+        project_id=PROJECT_ID,
+
+    )
+
+    # spark_task_obt = DataprocSubmitJobOperator(
+    #     task_id="spark_task_t_cmr",
+    #     job=SPARK_JOB_OBT,
+    #     region=REGION,
+    #     project_id=PROJECT_ID,
+    #
+    # )
 
     delete_cluster = DataprocDeleteClusterOperator(
         task_id="delete_cluster",
@@ -153,7 +147,16 @@ with DAG(
 
     end_workflow = DummyOperator(task_id="end_workflow")
 
-    start_workflow >> create_cluster >> spark_task >> delete_cluster >> end_workflow
+    (
+            start_workflow
+            >> create_cluster
+            >> spark_task_t_rl
+            >> spark_task_t_cmr
+            >> spark_task_t_up
+            # >> spark_task_obt
+            >> delete_cluster
+            >> end_workflow
+    )
 
     # from tests.system.utils.watcher import watcher
 
