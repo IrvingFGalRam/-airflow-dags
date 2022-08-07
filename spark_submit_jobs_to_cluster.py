@@ -4,6 +4,7 @@ Description: Creates an ephimeral dataproc spark cluster to submit jobs.
 """
 
 import os
+from airflow.models import Variable
 from datetime import datetime
 from airflow.models import DAG
 from airflow.operators.dummy import DummyOperator
@@ -21,11 +22,11 @@ ZONE = "us-central1-a"
 
 PROJECT_ID = os.environ.get("SYSTEM_TESTS_GCP_PROJECT", "")
 # "test", "show", "rl", "crm", "up", "obt"
-JOB_NAME_SELECTOR = os.environ.get("JOB_NAME_SELECTOR", "")
+JOB_NAME_SELECTOR = Variable.get("JOB_NAME_SELECTOR")
 # ENVs to Arguments
-ARG_TABLE_NAME = os.environ.get("ARG_TABLE_NAME", "")
-ARG_FORMAT = os.environ.get("ARG_FORMAT", "")
-ARG_N_RECORDS = os.environ.get("ARG_N_RECORDS", "")
+ARG_TABLE_NAME = Variable.get("ARG_TABLE_NAME")
+ARG_FORMAT = Variable.get("ARG_FORMAT")
+ARG_N_RECORDS = Variable.get("ARG_N_RECORDS")
 
 TIMEOUT = {"seconds": 1 * 2 * 60 * 60}
 
