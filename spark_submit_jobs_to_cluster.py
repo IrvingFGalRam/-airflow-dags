@@ -20,7 +20,7 @@ REGION = "us-central1"
 ZONE = "us-central1-a"
 
 PROJECT_ID = os.environ.get("SYSTEM_TESTS_GCP_PROJECT", "")
-JOB_SELECT_ENV = os.environ.get("JOB_NAME_SELECTOR", "show")    # "test", "show", "rl", "crm", "uo", "obt"
+JOB_NAME_SELECTOR = os.environ.get("JOB_NAME_SELECTOR", "")    # "test", "show", "rl", "crm", "uo", "obt"
 # ENVs to Arguments
 ARG_TABLE_NAME = os.environ.get("ARG_TABLE_NAME", "")
 ARG_FORMAT = os.environ.get("ARG_FORMAT", "")
@@ -42,7 +42,7 @@ SPARK_JOB_SHOW_TABLE = {
     "placement": {"cluster_name": CLUSTER_NAME},
     "spark_job": {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
-        "main_class": "org.example.TestSparkSession",
+        "main_class": "org.example.ShowTable",
         "args": [
             "gs://capstone-project-wzl-storage/silver/" + ARG_TABLE_NAME,
             ARG_FORMAT,
@@ -118,9 +118,9 @@ with DAG(
 ) as dag:
     start_workflow = DummyOperator(task_id="start_workflow")
 
-    spark_task = DataprocSubmitJobOperator(
-        task_id="spark_task",
-        job=JOB_DICT[JOB_SELECT_ENV],
+    spark_custom_task = DataprocSubmitJobOperator(
+        task_id="spark_custom_task",
+        job=JOB_DICT[JOB_NAME_SELECTOR],
         region=REGION,
         project_id=PROJECT_ID
     )
