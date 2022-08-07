@@ -54,7 +54,6 @@ CLUSTER_CONFIG = {
     "software_config": {
         "image_version": "2.0",
         "properties": {
-            # "spark.jars.packages:com.databricks:spark-xml_2.12:0.13.0"
             "spark:spark.jars.packages": "com.databricks:spark-xml_2.12:0.13.0,org.apache.spark:spark-mllib_2.12:3.1.3,org.apache.spark:spark-avro_2.12:3.1.3"
         }
     }
@@ -98,7 +97,7 @@ SPARK_JOB_T_CMR = {
     "placement": {"cluster_name": CLUSTER_NAME},
     "spark_job": {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
-        "main_class": "org.example.TransformClassifiedMovieReview ",
+        "main_class": "org.example.TransformClassifiedMovieReview",
     },
 }
 SPARK_JOB_T_RL = {
@@ -106,7 +105,7 @@ SPARK_JOB_T_RL = {
     "placement": {"cluster_name": CLUSTER_NAME},
     "spark_job": {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
-        "main_class": "org.example.TransformReviewLogs ",
+        "main_class": "org.example.TransformReviewLogs",
     },
 }
 SPARK_JOB_T_UP = {
@@ -114,7 +113,7 @@ SPARK_JOB_T_UP = {
     "placement": {"cluster_name": CLUSTER_NAME},
     "spark_job": {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
-        "main_class": "org.example.TransformUserPurchase ",
+        "main_class": "org.example.TransformUserPurchase",
     },
 }
 
