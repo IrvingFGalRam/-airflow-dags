@@ -54,7 +54,8 @@ CLUSTER_CONFIG = {
     "software_config": {
         "image_version": "2.0",
         "properties": {
-            "spark:spark.jars.packages=com.databricks:spark-xml_2.12:0.13.0,org.apache.spark:spark-mllib_2.12:3.1.3,org.apache.spark:spark-avro_2.12:3.1.3"
+            "spark": "spark.jars.packages=com.databricks:spark-xml_2.12:0.13.0,org.apache.spark:spark-mllib_2.12:3.1.3,org.apache.spark:spark-avro_2.12:3.1.3"
+            # "spark": "spark.jars.packages=com.databricks:spark-xml_2.12:0.13.0,org.apache.spark:spark-mllib_2.12:3.1.3,org.apache.spark:spark-avro_2.12:3.1.3"
         }
     }
 }
@@ -69,7 +70,6 @@ SPARK_JOB = {
     "spark_job": {
         "jar_file_uris": ["file:///usr/lib/spark/examples/jars/spark-examples.jar"],
         "main_class": "org.apache.spark.examples.SparkPi",
-
     },
 }
 SPARK_JOB_TEST = {
@@ -78,7 +78,6 @@ SPARK_JOB_TEST = {
     "spark_job": {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
         "main_class": "org.example.TestSparkSession",
-
     },
 }
 # SPARK_JOB_SHOW_TABLE = {
@@ -141,7 +140,8 @@ with DAG(
         task_id="spark_task_t_cmr",
         job=SPARK_JOB_T_CMR,
         region=REGION,
-        project_id=PROJECT_ID
+        project_id=PROJECT_ID,
+
     )
 
     delete_cluster = DataprocDeleteClusterOperator(
