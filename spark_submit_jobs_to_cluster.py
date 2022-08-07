@@ -13,13 +13,18 @@ from airflow.utils.dates import days_ago
 
 # General constants
 DAG_ID = "dataproc_submit_job"
-PROJECT_ID = os.environ.get("SYSTEM_TESTS_GCP_PROJECT", "")
-JOB_SELECT_ENV = os.environ.get("JOB_NAME_SELECTOR", "")
 CLUSTER_NAME = "cluster-dataproc-spark-deb"
 CLOUD_PROVIDER = "gcp"
 CLUSTER = "dataproc"
 REGION = "us-central1"
 ZONE = "us-central1-a"
+
+PROJECT_ID = os.environ.get("SYSTEM_TESTS_GCP_PROJECT", "")
+JOB_SELECT_ENV = os.environ.get("JOB_NAME_SELECTOR", "show")    # "test", "show", "rl", "crm", "uo", "obt"
+# ENVs to Arguments
+ARG_TABLE_NAME = os.environ.get("ARG_TABLE_NAME", "")
+ARG_FORMAT = os.environ.get("ARG_FORMAT", "")
+ARG_N_RECORDS = os.environ.get("ARG_N_RECORDS", "")
 
 TIMEOUT = {"seconds": 1 * 2 * 60 * 60}
 
@@ -39,11 +44,11 @@ SPARK_JOB_SHOW_TABLE = {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
         "main_class": "org.example.TestSparkSession",
     },
-    "arguments": {
-        "gs://capstone-project-wzl-storage/silver/classified_movie_review",
-        "avro",
-        "25"
-    }
+    "arguments": [
+        "gs://capstone-project-wzl-storage/silver/" + ARG_TABLE_NAME,
+        ARG_FORMAT,
+        ARG_N_RECORDS
+    ]
 }
 SPARK_JOB_T_CMR = {
     "reference": {"project_id": PROJECT_ID},
@@ -52,6 +57,11 @@ SPARK_JOB_T_CMR = {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
         "main_class": "org.example.TransformClassifiedMovieReview",
     },
+    "arguments": [
+        "gs://capstone-project-wzl-storage/bronze/movie_review.csv",
+        "gs://capstone-project-wzl-storage/silver/classified_movie_review",
+        ARG_FORMAT
+    ]
 }
 SPARK_JOB_T_RL = {
     "reference": {"project_id": PROJECT_ID},
@@ -60,6 +70,11 @@ SPARK_JOB_T_RL = {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
         "main_class": "org.example.TransformReviewLogs",
     },
+    "arguments": [
+        "gs://capstone-project-wzl-storage/bronze/log_reviews.csv",
+        "gs://capstone-project-wzl-storage/silver/review_logs",
+        ARG_FORMAT
+    ]
 }
 SPARK_JOB_T_UP = {
     "reference": {"project_id": PROJECT_ID},
@@ -68,6 +83,11 @@ SPARK_JOB_T_UP = {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
         "main_class": "org.example.TransformUserPurchase",
     },
+    "arguments": [
+        "gs://capstone-project-wzl-storage/tmp/user_purchase_psql.csv",
+        "gs://capstone-project-wzl-storage/silver/user_purchase",
+        ARG_FORMAT
+    ]
 }
 SPARK_JOB_OBT = {
     "reference": {"project_id": PROJECT_ID},
@@ -76,6 +96,9 @@ SPARK_JOB_OBT = {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
         "main_class": "org.example.GoldOBT",
     },
+    "arguments": [
+        "gs://capstone-project-wzl-storage/gold/movie_analytics"
+    ]
 }
 
 JOB_DICT = {

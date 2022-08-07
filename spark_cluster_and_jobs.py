@@ -122,7 +122,7 @@ with DAG(
     )
 
     spark_task_t_up = DataprocSubmitJobOperator(
-        task_id="spark_task_t_cmr",
+        task_id="spark_task_t_up",
         job=SPARK_JOB_T_UP,
         region=REGION,
         project_id=PROJECT_ID,
@@ -130,7 +130,7 @@ with DAG(
     )
 
     # spark_task_obt = DataprocSubmitJobOperator(
-    #     task_id="spark_task_t_cmr",
+    #     task_id="spark_task_obt",
     #     job=SPARK_JOB_OBT,
     #     region=REGION,
     #     project_id=PROJECT_ID,
