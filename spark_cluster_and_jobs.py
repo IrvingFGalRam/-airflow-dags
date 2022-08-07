@@ -51,7 +51,7 @@ CLUSTER_CONFIG = {
         "disk_config": {"boot_disk_type": "pd-standard", "boot_disk_size_gb": 50},
 
     },
-    "softwareConfig": {
+    "software_config": {
         "image_version": "2.0",
         "properties": {
             "spark.jars.packages": "com.databricks:spark-xml_2.12:0.13.0,org.apache.spark:spark-mllib_2.12:3.1.3,org.apache.spark:spark-avro_2.12:3.1.3"
@@ -138,7 +138,7 @@ with DAG(
     )
 
     spark_task = DataprocSubmitJobOperator(
-        task_id="spark_task",
+        task_id="spark_task_t_cmr",
         job=SPARK_JOB_T_CMR,
         region=REGION,
         project_id=PROJECT_ID
@@ -156,13 +156,13 @@ with DAG(
 
     start_workflow >> create_cluster >> spark_task >> delete_cluster >> end_workflow
 
-    from tests.system.utils.watcher import watcher
+    # from tests.system.utils.watcher import watcher
 
     # This test needs watcher in order to properly mark success/failure
     # when "teardown" task with trigger rule is part of the DAG
-    list(dag.tasks) >> watcher()
+    # list(dag.tasks) >> watcher()
 
-from tests.system.utils import get_test_run  # noqa: E402
+# from tests.system.utils import get_test_run  # noqa: E402
 
 # Needed to run the example DAG with pytest (see: tests/system/README.md#run_via_pytest)
-test_run = get_test_run(dag)
+# test_run = get_test_run(dag)
