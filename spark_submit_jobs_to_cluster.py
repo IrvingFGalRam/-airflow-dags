@@ -72,7 +72,7 @@ SPARK_JOB_T_RL = {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
         "main_class": "org.example.TransformReviewLogs",
         "args": {
-            "gs://capstone-project-w/zl-storage/bronze/log_reviews.csv",
+            "gs://capstone-project-wzl-storage/bronze/log_reviews.csv",
             "gs://capstone-project-wzl-storage/silver/review_logs",
             ARG_FORMAT
         }
