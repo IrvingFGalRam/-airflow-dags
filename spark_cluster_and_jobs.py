@@ -30,14 +30,14 @@ STABILITY_STATE = "unstable"
 REGION = "us-central1"
 ZONE = "us-central1-a"
 
-# GCP constants
-GCP_CONN_ID = "google_cloud_default"
-GCS_BUCKET_NAME = "capstone-project-wzl-storage"
-# GCS_KEY_NAME = "noheader_test_log_reviews.csv"
-
-# Postgres constants
-POSTGRES_CONN_ID = "postgres_default"
-POSTGRES_TABLE_NAME = "user_purchase"
+# # GCP constants
+# GCP_CONN_ID = "google_cloud_default"
+# GCS_BUCKET_NAME = "capstone-project-wzl-storage"
+# # GCS_KEY_NAME = "noheader_test_log_reviews.csv"
+#
+# # Postgres constants
+# POSTGRES_CONN_ID = "postgres_default"
+# POSTGRES_TABLE_NAME = "user_purchase"
 
 CLUSTER_CONFIG = {
     "master_config": {
