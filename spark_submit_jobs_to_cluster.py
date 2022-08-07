@@ -129,4 +129,4 @@ with DAG(
 
     end_workflow = DummyOperator(task_id="end_workflow")
 
-    start_workflow >> spark_task >> end_workflow
+    start_workflow >> spark_custom_task >> end_workflow
