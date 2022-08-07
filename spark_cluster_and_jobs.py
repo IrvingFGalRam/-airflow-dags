@@ -165,4 +165,4 @@ with DAG(
 from tests.system.utils import get_test_run  # noqa: E402
 
 # Needed to run the example DAG with pytest (see: tests/system/README.md#run_via_pytest)
-[docs]test_run = get_test_run(dag)
+test_run = get_test_run(dag)
