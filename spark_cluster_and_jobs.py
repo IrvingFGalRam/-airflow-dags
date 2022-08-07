@@ -54,7 +54,7 @@ CLUSTER_CONFIG = {
     "software_config": {
         "image_version": "2.0",
         "properties": {
-            "spark.jars.packages": "com.databricks:spark-xml_2.12:0.13.0,org.apache.spark:spark-mllib_2.12:3.1.3,org.apache.spark:spark-avro_2.12:3.1.3"
+            "spark.jars.packages:com.databricks:spark-xml_2.12:0.13.0,org.apache.spark:spark-mllib_2.12:3.1.3,org.apache.spark:spark-avro_2.12:3.1.3"
         }
     }
 }
