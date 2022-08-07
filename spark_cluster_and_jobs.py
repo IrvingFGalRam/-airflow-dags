@@ -1,6 +1,6 @@
-"""Template DAG
+"""Spark cluster and job subbmiter DAG
 Author: Irving FGR
-Description: Ingests the data from a GCS bucket into a postgres table.
+Description: Creates an ephimeral dataproc spark cluster to submit jobs.
 """
 
 import os
@@ -54,7 +54,7 @@ CLUSTER_CONFIG = {
     "software_config": {
         "image_version": "2.0",
         "properties": {
-            "spark.jars.packages:com.databricks:spark-xml_2.12:0.13.0,org.apache.spark:spark-mllib_2.12:3.1.3,org.apache.spark:spark-avro_2.12:3.1.3"
+            "spark:spark.jars.packages=com.databricks:spark-xml_2.12:0.13.0,org.apache.spark:spark-mllib_2.12:3.1.3,org.apache.spark:spark-avro_2.12:3.1.3"
         }
     }
 }

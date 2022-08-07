@@ -1,6 +1,6 @@
-"""Template DAG
+"""Clear bucket
 Author: Irving FGR
-Description: Ingests the data from a GCS bucket into a postgres table.
+Description: Clears bucket contents in order to perform terraform destroy.
 """
 
 from airflow.models import DAG
