@@ -30,6 +30,7 @@ from airflow.utils.dates import days_ago
 DAG_ID = "complete_workflow"
 STABILITY_STATE = "unstable"
 CLOUD_PROVIDER = "gcp"
+CLUSTER = "dataproc"
 
 
 # GCP constants
@@ -45,7 +46,6 @@ POSTGRES_TABLE_NAME = "user_purchase"
 
 # General constants
 CLUSTER_NAME = "cluster-dataproc-spark-deb"
-CLUSTER = "dataproc"
 REGION = "us-central1"
 ZONE = "us-central1-a"
 
@@ -195,6 +195,7 @@ with DAG(
 ) as dag:
     start_workflow = DummyOperator(task_id="start_workflow")
     continue_process = DummyOperator(task_id="continue_process")
+    continue_process_2 = DummyOperator(task_id="continue_process_2")
 
     verify_key_existence = GCSObjectExistenceSensor(
         task_id="verify_key_existence",
@@ -264,7 +265,7 @@ with DAG(
         task_id="validate_data_csv",
         conn_id=POSTGRES_CONN_ID,
         sql=f"SELECT COUNT(*) AS total_rows FROM {POSTGRES_TABLE_NAME}",
-        follow_task_ids_if_false=[continue_process.task_id],
+        follow_task_ids_if_false=[continue_process_2.task_id],
         follow_task_ids_if_true=[postgres_to_gcs_csv.task_id],
     )
 
@@ -325,7 +326,7 @@ with DAG(
         >> verify_key_existence
         >> create_table_entity
         >> validate_data >> [clear_table, continue_process] >> ingest_data
-        >> validate_data_csv >> [continue_process, postgres_to_gcs_csv]
+        >> validate_data_csv >> [continue_process_2, postgres_to_gcs_csv]
         >> create_cluster
         >> spark_task_t_rl
         >> spark_task_t_cmr
