@@ -57,6 +57,8 @@ def ingest_data_from_gcs(
         )
         with tempfile.NamedTemporaryFile() as tmp_df:
             df = pd.read_csv(tmp.name, header=0)
+            df["int"] = pd.Series([], dtype=object)
+            df["str"] = pd.Series([], dtype=str)
             # df2 = df.drop(df.columns[4], axis = 1)
             # df2.to_csv(path_or_buf=tmp_df.name,index=None, header=None, sep='\t')
             df.to_csv(path_or_buf=tmp_df.name, index=None, header=None, sep='\t')
