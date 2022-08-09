@@ -46,7 +46,6 @@ def ingest_data_from_gcs(
         postgres_conn_id (str): Name of the postgres connection ID.
     """
     import tempfile
-    import pandas as pd
 
     gcs_hook = GCSHook(gcp_conn_id=gcp_conn_id)
     psql_hook = PostgresHook(postgres_conn_id)
@@ -56,11 +55,6 @@ def ingest_data_from_gcs(
             bucket_name=gcs_bucket, object_name=gcs_object, filename=tmp.name
         )
         psql_hook.copy_expert(f"COPY {postgres_table} FROM STDIN DELIMITER ',' CSV HEADER", tmp.name)
-        # with tempfile.NamedTemporaryFile() as tmp_df:
-        #     # df = pd.read_csv(tmp.name, header=0, dtype={'CustomerID': object})
-        #     df = pd.read_csv(tmp.name, header=0)
-        #     df.astype({'CustomerID': 'Int64'}).dtypes.to_csv(path_or_buf=tmp_df.name, index=None, header=None, sep='\t')
-        #     psql_hook.bulk_load(table=postgres_table, tmp_file=tmp_df.name)
 
 
 with DAG(
