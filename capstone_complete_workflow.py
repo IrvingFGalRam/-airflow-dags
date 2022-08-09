@@ -324,16 +324,13 @@ with DAG(
         start_workflow
         >> verify_key_existence
         >> create_table_entity
-        >> validate_data
+        >> validate_data >> [clear_table, continue_process] >> ingest_data
+        >> validate_data_csv >> [continue_process, postgres_to_gcs_csv]
+        >> create_cluster
+        >> spark_task_t_rl
+        >> spark_task_t_cmr
+        >> spark_task_t_up
+        >> spark_task_t_ma
+        >> delete_cluster
+        >> end_workflow
     )
-    validate_data >> [clear_table, continue_process] >> ingest_data
-    # Postgre to temp csv
-    >> postgres_to_gcs_csv >> [continue_process, postgres_to_gcs_csv]
-    # Submit Spark jobs
-    >> create_cluster
-    >> spark_task_t_rl
-    >> spark_task_t_cmr
-    >> spark_task_t_up
-    >> spark_task_t_ma
-    >> delete_cluster
-    >> end_workflow
