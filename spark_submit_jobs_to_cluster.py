@@ -23,9 +23,9 @@ ZONE = "us-central1-a"
 # ENV VAR
 PROJECT_ID = os.environ.get("SYSTEM_TESTS_GCP_PROJECT", "")
 # Variables to Arguments
-JOB_NAME_SELECTOR = Variable.get("JOB_NAME_SELECTOR")   # "test", "show", "rl", "crm", "up", "obt"
+JOB_NAME_SELECTOR = Variable.get("JOB_NAME_SELECTOR")   # "test", "show", "rl", "crm", "up", "ma"
 ARG_TABLE_NAME = Variable.get("ARG_TABLE_NAME")
-ARG_FORMAT = Variable.get("ARG_FORMAT")
+ARG_FORMAT = Variable.get("ARG_FORMAT", default_var="avro")
 ARG_N_RECORDS = Variable.get("ARG_N_RECORDS")
 
 TIMEOUT = {"seconds": 1 * 2 * 60 * 60}
@@ -91,14 +91,14 @@ SPARK_JOB_T_UP = {
         ]
     }
 }
-SPARK_JOB_OBT = {
+SPARK_JOB_T_MA = {
     "reference": {"project_id": PROJECT_ID},
     "placement": {"cluster_name": CLUSTER_NAME},
     "spark_job": {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
-        "main_class": "org.example.GoldOBT",
+        "main_class": "org.example.TransformMovieAnalytics",
         "args": [
-            "gs://capstone-project-wzl-storage/gold/movie_analytics"
+            ARG_FORMAT
         ]
     }
 }
@@ -109,7 +109,7 @@ JOB_DICT = {
     "rl": SPARK_JOB_T_RL,
     "crm": SPARK_JOB_T_CMR,
     "up": SPARK_JOB_T_UP,
-    "obt": SPARK_JOB_OBT
+    "ma": SPARK_JOB_T_MA
 }
 
 with DAG(

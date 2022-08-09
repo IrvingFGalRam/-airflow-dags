@@ -96,14 +96,14 @@ SPARK_JOB_T_UP = {
         ]
     }
 }
-SPARK_JOB_OBT = {
+SPARK_JOB_T_MA = {
     "reference": {"project_id": PROJECT_ID},
     "placement": {"cluster_name": CLUSTER_NAME},
     "spark_job": {
         "jar_file_uris": ["gs://capstone-project-wzl-storage/jars/scala-jobs_2.12-0.1.1.jar"],
-        "main_class": "org.example.GoldOBT",
+        "main_class": "org.example.TransformMovieAnalytics",
         "args": [
-            "gs://capstone-project-wzl-storage/gold/movie_analytics"
+            ARG_FORMAT
         ]
     }
 }
@@ -150,13 +150,13 @@ with DAG(
 
     )
 
-    # spark_task_obt = DataprocSubmitJobOperator(
-    #     task_id="spark_task_obt",
-    #     job=SPARK_JOB_OBT,
-    #     region=REGION,
-    #     project_id=PROJECT_ID,
-    #
-    # )
+    spark_task_t_ma = DataprocSubmitJobOperator(
+        task_id="spark_task_t_ma",
+        job=SPARK_JOB_T_MA,
+        region=REGION,
+        project_id=PROJECT_ID,
+
+    )
 
     delete_cluster = DataprocDeleteClusterOperator(
         task_id="delete_cluster",
@@ -174,7 +174,7 @@ with DAG(
             >> spark_task_t_rl
             >> spark_task_t_cmr
             >> spark_task_t_up
-            # >> spark_task_obt
+            >> spark_task_t_ma
             >> delete_cluster
             >> end_workflow
     )
