@@ -55,7 +55,7 @@ def ingest_data_from_gcs(
         gcs_hook.download(
             bucket_name=gcs_bucket, object_name=gcs_object, filename=tmp.name
         )
-        psql_hook.copy_expert(f"COPY {postgres_table} FROM STDIN DELIMITER ‘,’ CSV HEADER", tmp_file=tmp_df.name)
+        psql_hook.copy_expert(f"COPY {postgres_table} FROM STDIN DELIMITER ‘,’ CSV HEADER", tmp_file=tmp.name)
         # with tempfile.NamedTemporaryFile() as tmp_df:
         #     # df = pd.read_csv(tmp.name, header=0, dtype={'CustomerID': object})
         #     df = pd.read_csv(tmp.name, header=0)
